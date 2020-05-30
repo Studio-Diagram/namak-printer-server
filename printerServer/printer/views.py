@@ -55,3 +55,28 @@ def print_something(request):
         file.close()
 
     return JsonResponse({"response": 'OK'})
+
+
+@csrf_exempt
+def print_night_report(request):
+    data = request.POST
+    for e in data:
+        data = json.loads(e)
+
+    location_printer_url = "https://namak.works/"
+
+    options = [
+        ('page-width', '80mm'),
+        ('page-height', '297mm')
+    ]
+    pdfkit.from_url(location_printer_url + 'template/night-report?cash_id=%s' % data['cash_id'],
+                    'C:/Users/CafeBoard/Desktop/close.pdf', options=options)
+    currentprinter = 'Cash'
+    params = '-ghostscript "' + GHOSTSCRIPT_PATH + '" -printer "' + currentprinter + '" -copies 1 "C:/Users/CafeBoard/Desktop/close.pdf "'
+    win32api.ShellExecute(0, 'open', GSPRINT_PATH, params, 'K', 0)
+    time.sleep(3)
+    os.remove("C:/Users/CafeBoard/Desktop/close.pdf")
+    file = open("C:/Users/CafeBoard/Desktop/close.pdf", 'w')
+    file.close()
+
+    return JsonResponse({"response": 'OK'})
